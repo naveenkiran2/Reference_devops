@@ -1,0 +1,56 @@
+#!groovy
+
+def result;
+
+node{
+
+    stage('SCM') {
+     checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[credentialsId: '5fb6801a-7ed9-4b53-8dff-ea4f65339401', depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: 'http://172.20.100.172/svn/ANOUDONLINE/trunk/Online']], workspaceUpdater: [$class: 'UpdateUpdater']])
+    }
+     
+   /*  
+ stage('QUALITY CHECK'){
+        withSonarQubeEnv('SONAR') {
+            bat returnStatus: true, script: 'C:\\Sonar\\sonar-scanner-2.8\\bin\\sonar-scanner.bat -e -Dsonar.host.url=http://sourcebuildtest:8888 -Dsonar.login=fc3e988b78e41da4ed71b26d83c281d745b437f6 -Dsonar.projectName=ANOUD_ONLINE_UAT -Dsonar.projectVersion=1.0 -Dsonar.java.libraries=C:\\Libraries\\*.jar -Dsonar.projectKey=JENKINS:ANOUD_ONLINE_UAT -Dsonar.java.binaries=build -Dsonar.sources=src -Dsonar.projectBaseDir=C:\\Users\\sbuildtest\\.jenkins\\workspace\\ANOUD_ONLINE_UAT' 
+        }
+
+    }
+   
+    stage('QUALITY GATE'){
+        echo 'Waiting for Quality Result to Publish ETC : 10 Minutes'            
+        timeout(time: 5, unit: 'MINUTES') {
+            def qg = waitForQualityGate()
+            if (qg.status != 'OK') {
+                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
+            }
+            echo "${qg.status}" 
+        }
+    }
+    */
+   
+    stage('BUILD'){
+        timestamps {
+            bat "ant.bat -file jenkins-build.xml && exit %%ERRORLEVEL%%"
+        }
+    }
+  /*
+    stage('UNDEPLOY'){
+        result = bat returnStatus: true, script: "java -Xms256M -Xmx2048M -cp c:\\Weblogic\\wlfullclient.jar weblogic.Deployer -debug -remote -verbose -noexit -name Online -targets anoud_cluster -adminurl t3://172.20.132.72:7001 -user weblogic12c -password welcome123 -undeploy"
+    }
+    if (result != 0) {
+        echo '[FAILURE] Failed to build'
+        currentBuild.result = 'FAILURE'
+        return
+    }
+    stage('DEPLOY'){
+        result = bat returnStatus: true, script: "java -Xms256M -Xmx2048M -cp c:\\Weblogic\\wlfullclient.jar weblogic.Deployer -debug -stage -remote -verbose -upload -name Online -source \"C:/Users/sbuildtest/.jenkins/workspace/ANOUD_ONLINE_UAT/dist/Online.war\" -targets anoud_cluster -adminurl t3://172.20.132.72:7001 -user weblogic12c -password welcome123 -deploy"
+    }
+    if (result != 0) {
+        echo '[FAILURE] Failed to build'
+        currentBuild.result = 'FAILURE'
+        emailext attachLog: true, body: "Please find attached build log for more info.\nRegards,\nBuild Admin\n\nThis is an auto-generated mail. Do not reply.", recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider']], subject: 'Build Failed', to: 'thoufeak.rahman'
+        return
+    }
+    emailext attachLog: true, body: 'Please find attached build log for more info.\nRegards,\nBuild Admin\n\nThis is an auto-generated mail. Do not reply.', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider']], subject: 'Build Info', to: 'thoufeak.rahman'
+*/
+}
